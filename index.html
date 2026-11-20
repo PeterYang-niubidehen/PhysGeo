@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhysGeo</title>
+<meta name="description" content="Grounding video generation in explicit physical simulation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <h1>PhysGeo</h1>
+  <p class="subtitle">Grounding Video Generation in Explicit Physical Simulation</p>
+  <p class="anon">Anonymous submission</p>
+</header>
+
+<main>
+
+<!-- ============================== teaser ============================== -->
+<section class="teaser wide">
+  <div class="teaser-row">
+    <figure><video data-src="ours_house_more" muted loop playsinline></video>
+      <figcaption>Build a house: two blue cubes onto the arch, then the red roof.</figcaption></figure>
+    <figure><video data-src="ours_utensil" muted loop playsinline></video>
+      <figcaption>Put the green scraper on the large blue ladle.</figcaption></figure>
+    <figure><video data-src="ours_cloth" muted loop playsinline></video>
+      <figcaption>Drop the blue cloth into the grey square tub.</figcaption></figure>
+  </div>
+  <p class="lede">A single photograph is turned into a physical scene, the scene is simulated, and a video model renders the
+    simulated motion back into the photograph. What moves, where it goes and how it collides is decided by the
+    simulator&nbsp;&mdash; the video model only has to make it look real.</p>
+</section>
+
+<!-- ============================== overview ============================== -->
+<section id="overview">
+  <h2>Overview</h2>
+  <p>A video can look convincing while depicting the wrong physical outcome. The problem is sharpest when several objects
+    interact: the generator has to decide which body moves, how contact changes its motion and how that change spreads
+    through the scene. Text prompts specify none of this precisely.</p>
+  <p>PhysGeo makes the outcome explicit. From the reference image and a few scene priors we build a rigid-body scene and
+    simulate it. The resulting trajectory is projected into the photograph's camera as per-frame depth and surface normals,
+    and a Cosmos video generator, adapted with a light-weight geometry interface, renders a video that follows this
+    geometry while keeping the look of the photograph. The interface is learned from real robot videos with estimated
+    depth, so no photorealistic simulator rendering is ever needed for training. Because the physics lives in the
+    simulator, changing a mass or a contact changes the generated video, with the same image and the same prompt.</p>
+</section>
+
+<!-- ============================== method ============================== -->
+<section id="method">
+  <h2>Method</h2>
+  <div class="pipeline sync" data-group="pipe">
+    <figure class="step"><img data-poster="photo_house_more" alt="reference photograph"><figcaption><b>Photograph</b><span>input</span></figcaption></figure>
+    <div class="arrow" aria-hidden="true"></div>
+    <figure class="step"><video data-src="sim_house_more" muted loop playsinline></video><figcaption><b>Simulation</b><span>rigid bodies, contact</span></figcaption></figure>
+    <div class="arrow" aria-hidden="true"></div>
+    <figure class="step"><video data-src="depth_house_more" muted loop playsinline></video><figcaption><b>Depth</b><span>in the photo's camera</span></figcaption></figure>
+    <div class="arrow plus" aria-hidden="true"></div>
+    <figure class="step"><video data-src="normal_house_more" muted loop playsinline></video><figcaption><b>Normals</b><span>in the photo's camera</span></figcaption></figure>
+    <div class="arrow" aria-hidden="true"></div>
+    <figure class="step out"><video data-src="ours_house_more" muted loop playsinline></video><figcaption><b>Generated video</b><span>geometry-conditioned Cosmos</span></figcaption></figure>
+  </div>
+
+  <div class="three">
+    <div>
+      <h3>1&ensp;Photo to physical scene</h3>
+      <p>Objects are represented by reconstructed or fitted primitive meshes, and the camera is fitted to image landmarks so
+        that simulated surfaces land on the right pixels. Robot motion is scripted; everything that is pushed, lifted, hit
+        or dropped is simulated, with contact and penetration checks kept alongside the trajectory.</p>
+    </div>
+    <div>
+      <h3>2&ensp;Geometry tokens</h3>
+      <p>Depth and normals pass through the same video VAE as the frames. Their tokens share spatial positions with the video
+        tokens and are interleaved frame by frame, so attention can tie an image patch to the surface behind it. The first
+        frame stays clean and is restored after every solver step; LoRA adapts an otherwise frozen backbone.</p>
+    </div>
+    <div>
+      <h3>3&ensp;Learned from real video</h3>
+      <p>Training uses real manipulation clips with depth estimated by a monocular model and normals derived from it. Noise
+        mixing and geometric augmentation bridge the gap between estimated depth at training time and clean simulator depth
+        at test time.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== results ============================== -->
+<section id="results">
+  <h2>Results</h2>
+  <p>Each video is generated from one real photograph and one task description. Use <em>show geometry</em> to see the
+    surface normals of the simulated trajectory, which is what the video model is conditioned on.</p>
+  <div class="gallery">
+    <div class="card" data-task="house_more">
+      <div class="pair"><video data-src="ours_house_more" muted loop playsinline></video><video class="sim" data-src="normal_house_more" muted loop playsinline hidden></video></div>
+      <div class="meta"><p>Stack two blue cubes on the yellow arch, then add the red roof. Three pick-and-place steps, 12&nbsp;s.</p><button class="toggle">show geometry</button></div>
+    </div>
+    <div class="card" data-task="house">
+      <div class="pair"><video data-src="ours_house" muted loop playsinline></video><video class="sim" data-src="normal_house" muted loop playsinline hidden></video></div>
+      <div class="meta"><p>Lift the red triangle and place it on the yellow arch as a roof.</p><button class="toggle">show geometry</button></div>
+    </div>
+    <div class="card" data-task="cloth">
+      <div class="pair"><video data-src="ours_cloth" muted loop playsinline></video><video class="sim" data-src="normal_cloth" muted loop playsinline hidden></video></div>
+      <div class="meta"><p>Swing the blue cloth over and drop it into the grey <em>square</em> tub, not the round bucket next to it.</p><button class="toggle">show geometry</button></div>
+    </div>
+    <div class="card">
+      <div class="pair"><video data-src="ours_blocks" muted loop playsinline></video><video class="sim" data-src="normal_blocks" muted loop playsinline hidden></video></div>
+      <div class="meta"><p>Push the block house over. Blocks fall only where the gripper makes contact.</p><button class="toggle">show geometry</button></div>
+    </div>
+    <div class="card" data-task="utensil">
+      <div class="pair"><video data-src="ours_utensil" muted loop playsinline></video><video class="sim" data-src="normal_utensil" muted loop playsinline hidden></video></div>
+      <div class="meta"><p>Among dozens of utensils, pick the small green scraper and place it on the large light-blue ladle.</p><button class="toggle">show geometry</button></div>
+    </div>
+    <div class="card">
+      <div class="pair"><video data-src="collision_ours_factual" muted loop playsinline></video></div>
+      <div class="meta"><p>Equal-mass head-on collision: the red ball stops and the blue ball carries on.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== comparisons ============================== -->
+<section id="compare" class="wide">
+  <h2>Comparison</h2>
+  <p class="narrow">Same photograph, same task description, same output length for every method. Baselines are open
+    image-to-video models: PhysisForcing (the physics-adapted Cosmos checkpoint we start from, without geometry),
+    Wan2.2 (5B and 14B), Hy-Nomas and Cosmos3-Nano.</p>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="house_more">Block house</button>
+    <button role="tab" aria-selected="false" data-tab="utensil">Scraper on ladle</button>
+    <button role="tab" aria-selected="false" data-tab="cloth">Cloth into tub</button>
+    <button role="tab" aria-selected="false" data-tab="blocks">Pushing blocks</button>
+  </div>
+
+  <div class="player-bar"><button data-act="restart">restart</button><button data-act="toggle">pause</button><button data-act="slow">0.5&times;</button></div>
+
+  <div class="tabpanel" data-panel="house_more">
+    <div class="grid g6 sync" data-group="c_house_more" style="--ar:16/9">
+      <figure class="ours"><video data-src="ours_house_more" muted loop playsinline></video><figcaption>Ours</figcaption></figure>
+      <figure><video data-src="pf_house_more" muted loop playsinline></video><figcaption>PhysisForcing</figcaption></figure>
+      <figure><video data-src="wan5b_house_more" muted loop playsinline></video><figcaption>Wan2.2-5B</figcaption></figure>
+      <figure><video data-src="wan14b_house_more" muted loop playsinline></video><figcaption>Wan2.2-14B</figcaption></figure>
+      <figure><video data-src="hynomas_house_more" muted loop playsinline></video><figcaption>Hy-Nomas</figcaption></figure>
+      <figure><video data-src="cosmos3_house_more" muted loop playsinline></video><figcaption>Cosmos3-Nano</figcaption></figure>
+    </div>
+    <dl class="notes">
+      <dt>Ours</dt><dd>Blue cube, blue cube, roof &mdash; in order, each carried by the gripper. Unused blocks stay put.</dd>
+      <dt>PhysisForcing</dt><dd>The arch changes shape as blocks merge into it; a blue cube is still hanging in the gripper at the end.</dd>
+      <dt>Wan2.2-5B</dt><dd>A large yellow-and-red triangle grows out of the table.</dd>
+      <dt>Wan2.2-14B</dt><dd>The finished house is there after two seconds; the cubes and roof jump into place.</dd>
+      <dt>Hy-Nomas</dt><dd>A second yellow arch appears next to the first and the house is built on the copy.</dd>
+      <dt>Cosmos3-Nano</dt><dd>Blue cubes multiply around the arch and a second red triangle appears.</dd>
+    </dl>
+  </div>
+
+  <div class="tabpanel" data-panel="utensil" hidden>
+    <div class="grid g6 sync" data-group="c_utensil" style="--ar:498/384">
+      <figure class="ours"><video data-src="ours_utensil" muted loop playsinline></video><figcaption>Ours</figcaption></figure>
+      <figure><video data-src="pf_utensil" muted loop playsinline></video><figcaption>PhysisForcing</figcaption></figure>
+      <figure><video data-src="wan5b_utensil" muted loop playsinline></video><figcaption>Wan2.2-5B</figcaption></figure>
+      <figure><video data-src="wan14b_utensil" muted loop playsinline></video><figcaption>Wan2.2-14B</figcaption></figure>
+      <figure><video data-src="hynomas_utensil" muted loop playsinline></video><figcaption>Hy-Nomas</figcaption></figure>
+      <figure><video data-src="cosmos3_utensil" muted loop playsinline></video><figcaption>Cosmos3-Nano</figcaption></figure>
+    </div>
+    <dl class="notes">
+      <dt>Ours</dt><dd>Picks the green scraper and sets it down on the ladle; nothing else on the cloth moves.</dd>
+      <dt>PhysisForcing</dt><dd>Lifts a different green object at the top of the frame.</dd>
+      <dt>Wan2.2-5B</dt><dd>A giant bowl appears and covers half of the scene.</dd>
+      <dt>Wan2.2-14B</dt><dd>Grabs the green knife instead, which then flies off.</dd>
+      <dt>Hy-Nomas</dt><dd>Moves the scraper, but leaves it on the cloth away from the ladle.</dd>
+      <dt>Cosmos3-Nano</dt><dd>Lifts a different green utensil.</dd>
+    </dl>
+  </div>
+
+  <div class="tabpanel" data-panel="cloth" hidden>
+    <div class="grid g4 sync" data-group="c_cloth" style="--ar:16/9">
+      <figure class="ours"><video data-src="ours_cloth" muted loop playsinline></video><figcaption>Ours</figcaption></figure>
+      <figure><video data-src="pf_cloth" muted loop playsinline></video><figcaption>PhysisForcing</figcaption></figure>
+      <figure><video data-src="wan5b_cloth" muted loop playsinline></video><figcaption>Wan2.2-5B</figcaption></figure>
+      <figure><video data-src="hynomas_cloth" muted loop playsinline></video><figcaption>Hy-Nomas</figcaption></figure>
+    </div>
+    <dl class="notes">
+      <dt>Ours</dt><dd>The cloth ends up inside the grey square tub.</dd>
+      <dt>PhysisForcing</dt><dd>Drops the cloth into the round blue bucket.</dd>
+      <dt>Wan2.2-5B</dt><dd>The arm bends unnaturally and the cloth never reaches a container.</dd>
+      <dt>Hy-Nomas</dt><dd>The cloth falls on the floor between the containers.</dd>
+    </dl>
+  </div>
+
+  <div class="tabpanel" data-panel="blocks" hidden>
+    <div class="grid g4 sync" data-group="c_blocks" style="--ar:16/9">
+      <figure class="ours"><video data-src="ours_blocks" muted loop playsinline></video><figcaption>Ours</figcaption></figure>
+      <figure><video data-src="pf_blocks" muted loop playsinline></video><figcaption>PhysisForcing</figcaption></figure>
+      <figure><video data-src="wan5b_blocks" muted loop playsinline></video><figcaption>Wan2.2-5B</figcaption></figure>
+      <figure><video data-src="hynomas_blocks" muted loop playsinline></video><figcaption>Hy-Nomas</figcaption></figure>
+    </div>
+    <dl class="notes">
+      <dt>Ours</dt><dd>The gripper pushes into the house and the blocks topple away from the contact.</dd>
+      <dt>PhysisForcing</dt><dd>The roof is pulled off and the remaining blocks scatter by themselves.</dd>
+      <dt>Wan2.2-5B</dt><dd>The camera jumps and the blocks lose their shapes.</dd>
+      <dt>Hy-Nomas</dt><dd>The house collapses while the arm is still far away.</dd>
+    </dl>
+  </div>
+</section>
+
+<!-- ============================== counterfactual ============================== -->
+<section id="control" class="wide">
+  <h2>Changing the physics, not the prompt</h2>
+  <p class="narrow">We change one physical parameter in the simulator and render again with the <em>same</em> photograph,
+    prompt and seed. A text-only model can only be told about the change in words; here Wan2.2-5B receives the
+    intervention in its prompt.</p>
+
+  <h3 class="narrow">Domino split &mdash; the domino at the split is made 10&times; heavier</h3>
+  <div class="grid g4 sync cf" data-group="cf_domino" style="--ar:4/3">
+    <figure class="ours"><video data-src="domino_ours_factual" muted loop playsinline></video><figcaption>Ours &middot; as photographed<span class="tag ok">blue line falls</span></figcaption></figure>
+    <figure class="ours"><video data-src="domino_ours_heavy" muted loop playsinline></video><figcaption>Ours &middot; heavy domino<span class="tag ok">blue line stands</span></figcaption></figure>
+    <figure><video data-src="domino_wan_factual" muted loop playsinline></video><figcaption>Wan2.2 &middot; as photographed<span class="tag ok">blue line falls</span></figcaption></figure>
+    <figure><video data-src="domino_wan_heavy" muted loop playsinline></video><figcaption>Wan2.2 &middot; told &ldquo;heavy&rdquo;<span class="tag bad">blue line still falls</span></figcaption></figure>
+  </div>
+
+  <h3 class="narrow">Head-on collision &mdash; the blue ball is made 4&times; heavier</h3>
+  <div class="grid g4 sync cf" data-group="cf_collision" style="--ar:640/366">
+    <figure class="ours"><video data-src="collision_ours_factual" muted loop playsinline></video><figcaption>Ours &middot; equal masses<span class="tag ok">red stops, blue moves on</span></figcaption></figure>
+    <figure class="ours"><video data-src="collision_ours_cf" muted loop playsinline></video><figcaption>Ours &middot; blue 4&times; heavier<span class="tag ok">red bounces back</span></figcaption></figure>
+    <figure><video data-src="collision_wan_factual" muted loop playsinline></video><figcaption>Wan2.2 &middot; equal masses<span class="tag bad">red bounces up and back</span></figcaption></figure>
+    <figure><video data-src="collision_wan_cf" muted loop playsinline></video><figcaption>Wan2.2 &middot; told &ldquo;4&times; heavier&rdquo;<span class="tag bad">red follows blue</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- ============================== measured ============================== -->
+<section id="measured" class="wide">
+  <h2>Measured physics</h2>
+  <p class="narrow">A scene from a public physics benchmark for video models, scored by the benchmark's own tracker and
+    evaluator. Baseline videos are the ones released with the benchmark.</p>
+
+  <h3 class="narrow">Equal-mass collision &mdash; momentum must carry over to the resting ball</h3>
+  <div class="grid g4 sync" data-group="m_p5" style="--ar:640/366">
+    <figure class="ours"><video data-src="collision_ours_factual" muted loop playsinline></video><figcaption>Ours<span class="score"><i style="--v:.9425"></i>94.3</span></figcaption></figure>
+    <figure><video data-src="p5_minimax" muted loop playsinline></video><figcaption>MiniMax H3<span class="score"><i style="--v:.2475"></i>24.8</span></figcaption></figure>
+    <figure><video data-src="p5_cosmos3super" muted loop playsinline></video><figcaption>Cosmos 3 Super<span class="score"><i style="--v:.15"></i>15.0</span></figcaption></figure>
+    <figure><video data-src="p5_wan14b" muted loop playsinline></video><figcaption>Wan2.2-A14B<span class="score"><i style="--v:.0975"></i>9.8</span></figcaption></figure>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>Anonymous project page.</p>
+</footer>
+
+<script src="static/main.js"></script>
+</body>
+</html>

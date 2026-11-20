@@ -1,0 +1,198 @@
+{
+ "ours_house_more": {
+  "name": "ours_house_more",
+  "duration": 11.81
+ },
+ "sim_house_more": {
+  "name": "sim_house_more",
+  "duration": 11.81
+ },
+ "depth_house_more": {
+  "name": "depth_house_more",
+  "duration": 11.81,
+  "size": [
+   640,
+   360
+  ]
+ },
+ "normal_house_more": {
+  "name": "normal_house_more",
+  "duration": 11.81,
+  "size": [
+   640,
+   360
+  ]
+ },
+ "ours_house": {
+  "name": "ours_house",
+  "duration": 6.06
+ },
+ "normal_house": {
+  "name": "normal_house",
+  "duration": 6.06,
+  "size": [
+   640,
+   360
+  ]
+ },
+ "ours_utensil": {
+  "name": "ours_utensil",
+  "duration": 6.06
+ },
+ "normal_utensil": {
+  "name": "normal_utensil",
+  "duration": 6.06,
+  "size": [
+   498,
+   384
+  ]
+ },
+ "ours_cloth": {
+  "name": "ours_cloth",
+  "duration": 6.06
+ },
+ "normal_cloth": {
+  "name": "normal_cloth",
+  "duration": 6.06,
+  "size": [
+   640,
+   360
+  ]
+ },
+ "ours_blocks": {
+  "name": "ours_blocks",
+  "duration": 7.06
+ },
+ "normal_blocks": {
+  "name": "normal_blocks",
+  "duration": 7.06,
+  "size": [
+   640,
+   360
+  ]
+ },
+ "pf_house_more": {
+  "name": "pf_house_more",
+  "duration": 11.81
+ },
+ "wan5b_house_more": {
+  "name": "wan5b_house_more",
+  "duration": 11.81
+ },
+ "wan14b_house_more": {
+  "name": "wan14b_house_more",
+  "duration": 11.81
+ },
+ "hynomas_house_more": {
+  "name": "hynomas_house_more",
+  "duration": 11.69
+ },
+ "cosmos3_house_more": {
+  "name": "cosmos3_house_more",
+  "duration": 11.81
+ },
+ "pf_utensil": {
+  "name": "pf_utensil",
+  "duration": 6.06
+ },
+ "wan5b_utensil": {
+  "name": "wan5b_utensil",
+  "duration": 6.06
+ },
+ "wan14b_utensil": {
+  "name": "wan14b_utensil",
+  "duration": 6.06
+ },
+ "hynomas_utensil": {
+  "name": "hynomas_utensil",
+  "duration": 6.0
+ },
+ "cosmos3_utensil": {
+  "name": "cosmos3_utensil",
+  "duration": 6.06
+ },
+ "pf_cloth": {
+  "name": "pf_cloth",
+  "duration": 6.06
+ },
+ "wan5b_cloth": {
+  "name": "wan5b_cloth",
+  "duration": 6.06
+ },
+ "hynomas_cloth": {
+  "name": "hynomas_cloth",
+  "duration": 6.0
+ },
+ "pf_blocks": {
+  "name": "pf_blocks",
+  "duration": 7.06
+ },
+ "wan5b_blocks": {
+  "name": "wan5b_blocks",
+  "duration": 7.06
+ },
+ "hynomas_blocks": {
+  "name": "hynomas_blocks",
+  "duration": 7.0
+ },
+ "domino_ours_factual": {
+  "name": "domino_ours_factual",
+  "duration": 4.06
+ },
+ "domino_ours_heavy": {
+  "name": "domino_ours_heavy",
+  "duration": 4.06
+ },
+ "domino_wan_factual": {
+  "name": "domino_wan_factual",
+  "duration": 4.06
+ },
+ "domino_wan_heavy": {
+  "name": "domino_wan_heavy",
+  "duration": 4.06
+ },
+ "collision_ours_factual": {
+  "name": "collision_ours_factual",
+  "duration": 4.06
+ },
+ "collision_ours_cf": {
+  "name": "collision_ours_cf",
+  "duration": 4.06
+ },
+ "collision_wan_factual": {
+  "name": "collision_wan_factual",
+  "duration": 4.06
+ },
+ "collision_wan_cf": {
+  "name": "collision_wan_cf",
+  "duration": 4.06
+ },
+ "p5_cosmos3super": {
+  "name": "p5_cosmos3super",
+  "duration": 5.06
+ },
+ "p5_minimax": {
+  "name": "p5_minimax",
+  "duration": 5.17
+ },
+ "p5_wan14b": {
+  "name": "p5_wan14b",
+  "duration": 5.06
+ },
+ "pend_ours": {
+  "name": "pend_ours",
+  "duration": 5.0
+ },
+ "pend_cosmos3super": {
+  "name": "pend_cosmos3super",
+  "duration": 5.0
+ },
+ "pend_wan14b": {
+  "name": "pend_wan14b",
+  "duration": 5.0
+ },
+ "pend_minimax": {
+  "name": "pend_minimax",
+  "duration": 5.0
+ }
+}
